@@ -15,7 +15,7 @@ namespace CoreServices.Repository
 
         Task<PostViewModel> GetPost(int? postId);
 
-        Task<int> AddPost(Post post);        
+        Task<int> AddPost(Post post);
 
         Task<int> DeletePost(int? postId);
 

@@ -22,13 +22,20 @@ namespace CoreServices.Controllers
         [Route("GetCategories")]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = await postRepository.GetCategories();
-            if (categories == null)
+            try
             {
-                return NotFound();
-            }
+                var categories = await postRepository.GetCategories();
+                if (categories == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(categories);
+                return Ok(categories);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
 
         }
 
@@ -36,31 +43,46 @@ namespace CoreServices.Controllers
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await postRepository.GetPosts();
-            if (posts == null)
+            try
             {
-                return NotFound();
-            }
+                var posts = await postRepository.GetPosts();
+                if (posts == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(posts);
+                return Ok(posts);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
         [Route("GetPost")]
         public async Task<IActionResult> GetPost(int? postId)
         {
-            if(postId==null)
+            if (postId == null)
             {
                 return BadRequest();
             }
 
-            var post = await postRepository.GetPost(postId);
-            if (post == null)
+            try
             {
-                return NotFound();
-            }
+                var post = await postRepository.GetPost(postId);
 
-            return Ok(post);
+                if (post == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(post);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
@@ -69,15 +91,24 @@ namespace CoreServices.Controllers
         {
             if (ModelState.IsValid)
             {
-                var postId = await postRepository.AddPost(model);
-                if (postId > 0)
+                try
                 {
-                    return Ok(postId);
+                    var postId = await postRepository.AddPost(model);
+                    if (postId > 0)
+                    {
+                        return Ok(postId);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
-                else
+                catch (Exception)
                 {
+
                     return BadRequest();
                 }
+
             }
 
             return BadRequest();
@@ -87,18 +118,27 @@ namespace CoreServices.Controllers
         [Route("DeletePost")]
         public async Task<IActionResult> DeletePost(int? postId)
         {
+            int result = 0;
+
             if (postId == null)
             {
                 return BadRequest();
             }
 
-            int result = await postRepository.DeletePost(postId);
-            if (result == 0)
+            try
             {
-                return NotFound();
+                result = await postRepository.DeletePost(postId);
+                if (result == 0)
+                {
+                    return NotFound();
+                }
+                return Ok();
             }
+            catch (Exception)
+            {
 
-            return Ok();
+                return BadRequest();
+            }
         }
 
 
@@ -108,8 +148,21 @@ namespace CoreServices.Controllers
         {
             if (ModelState.IsValid)
             {
-                await postRepository.UpdatePost(model);
-                return Ok();
+                try
+                {
+                    await postRepository.UpdatePost(model);
+
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetType().FullName == "Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException")
+                    {
+                        return NotFound();
+                    }
+
+                    return BadRequest();
+                }
             }
 
             return BadRequest();

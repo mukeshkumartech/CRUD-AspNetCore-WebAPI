@@ -88,7 +88,7 @@ namespace CoreServices.Repository
             if (db != null)
             {
                 //Find the post for specific post id
-                var post = await db.Post.FirstOrDefaultAsync(x=>x.PostId==postId);
+                var post = await db.Post.FirstOrDefaultAsync(x => x.PostId == postId);
 
                 if (post != null)
                 {
@@ -98,7 +98,6 @@ namespace CoreServices.Repository
                     //Commit the transaction
                     result = await db.SaveChangesAsync();
                 }
-
                 return result;
             }
 
@@ -119,4 +118,3 @@ namespace CoreServices.Repository
         }
     }
 }
-
